@@ -13,17 +13,22 @@ end
 function setTime()
 
   time= os.time
-
+  return time
 end
 
 
-function putnewTask(task,table)
-  table[tableloc]=task
-  tableloc=tableloc+1
+function putnewTask(task,table,place)
+  table[place]=task
+  place=place+1
+  return table,place
 end
 
-function tableTasks()
+function tableSetup(namefarm,hlong,hwide,seedsloc)
+  a = {}
+  a[name]= namefarm
+  a[long]=hlong
+  a[wide]=hwide
+  a[seed]=seedloc
 
-
-
+  return a
 end

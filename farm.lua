@@ -79,52 +79,58 @@ function harvest (length,seed)
       end
 end
 
-function taskloc()
+function task()
 
   _,_,from,port,_,message= event.pull("modem_message")
-  return message
+  demessage={}
+  for i in string.gmatch(message,"%S+") do
+    demessage[i]
+  end
+  return demessage
 end
 
 
 
-io.write("how long is the farm \n")
-long=tonumber(io.read())+1
-io.write("how wide is the farm \n")
-wide=tonumber(io.read())
-io.write("how much items \n")
-items=tonumber(io.read())
-io.write("seed loction in inventory \n")
-seedloc=tonumber(io.read())
-io.write("how long to wait in seconds \n")
-waiting=tonumber(io.read())
-ordir=nav.getFacing()
+-- demessage format "place" long wide items seedsloc
 
 while true do
 
-os.sleep(waiting)
---robot.forward()
+  info = task()
+  place = info[1]
+  action(place)
 
-for i=1,wide do
+  --how long is the farm
+  long=tonumber(info[2])
+  --"how wide is the farm
+  wide=tonumber(info[3])
+  --how much items
+  items=tonumber(info[4])
+  --seed loction in inventory
+  seedloc=tonumber(info[5])
+  ordir=nav.getFacing()
 
-  harvest(long,seedloc)
-  if (i%2 == 0) then
-    robot.turnLeft()
-    robot.forward()
-    robot.turnLeft()
-  else
-    robot.turnRight()
-    robot.forward()
-    robot.turnRight()
-end
 
-end
+  for i=1,wide do
 
-if (computer.energy()<2000) then
-  action(true)
-end
+    harvest(long,seedloc)
+    if (i%2 == 0) then
+      robot.turnLeft()
+      robot.forward()
+      robot.turnLeft()
+    else
+      robot.turnRight()
+      robot.forward()
+      robot.turnRight()
+    end
 
-action(false)
-dump(items)
-defDir(ordir)
+  end
+
+  if (computer.energy()<2000) then
+    action(true)
+  end
+
+  action(false)
+  dump(items)
+  defDir(ordir)
 
 end
