@@ -1,7 +1,9 @@
 local robot = require("robot")
 local component = require("component")
 local nav = component.navigation
+local net= component.modem
 local computer=require("computer")
+local event = require("event")
 
 function dump(give)
 
@@ -16,27 +18,27 @@ function dump(give)
     end
   end
 end
+
 function moveby(x)
   for i=1,x do
     robot.forward()
-  end    
+  end
 end
 
 function setdir(d,ns)
-  if d<0 and ns == false then  
+  if d<0 and ns == false then
     dir= 4
   elseif d<0 and ns == true then
     dir = 2
   elseif d>0 and ns == false then
     dir = 5
-  else 
+  else
     dir = 3
-  end 
+  end
 
   while nav.getFacing() ~= dir do
       robot.turnLeft()
   end
-
 end
 
 function defDir(dir)
@@ -45,45 +47,45 @@ function defDir(dir)
   end
 end
 
-function action(charge)
+function action(find)
   place =1
   loc=nil
   way= nav.findWaypoints(100)
-  find = nil
-  if charge == true then
-    find ="Power"
-  else
-    find="Chest"
-  end
 
-  
   while way[place] ~= nil do
    if (string.match(way[place]["label"],find)) then
       loc= way[place]["position"]
       break
     end
-    
+
     place=place+1
   end
-
-setdir(loc[1],false)
-moveby(math.abs(loc[1])) 
-setdir(loc[3],true)
-moveby(math.abs(loc[3]))    
-
+  if loc[1]~= nil
+    setdir(loc[1],false)
+    moveby(math.abs(loc[1]))
+    setdir(loc[3],true)
+    moveby(math.abs(loc[3]))
+    end
 end
 
 function harvest (length,seed)
+  robot.select(seed)
 
-robot.select(seed)
+    for i = 1,length do
+      robot.forward()
+      robot.swingDown()
+      robot.placeDown()
 
-  for i = 1,length do
-    robot.forward()    
-    robot.swingDown()
-    robot.placeDown()
-    
-  end
+      end
 end
+
+function taskloc()
+
+  _,_,from,port,_,message= event.pull("modem_message")
+  return message
+end
+
+
 
 io.write("how long is the farm \n")
 long=tonumber(io.read())+1
@@ -97,20 +99,20 @@ io.write("how long to wait in seconds \n")
 waiting=tonumber(io.read())
 ordir=nav.getFacing()
 
-while true do 
+while true do
 
 os.sleep(waiting)
 --robot.forward()
 
 for i=1,wide do
-  
-  harvest(long,seedloc)  
+
+  harvest(long,seedloc)
   if (i%2 == 0) then
     robot.turnLeft()
     robot.forward()
     robot.turnLeft()
   else
-    robot.turnRight() 
+    robot.turnRight()
     robot.forward()
     robot.turnRight()
 end
